@@ -61,12 +61,121 @@
 
     <li class="apidocModuleLi"><a href="#apidoc.module.webpack-load-plugins">module webpack-load-plugins</a><ol>
 
+        <li>
+
+            <a class="apidocElementLiA" href="#apidoc.element.webpack-load-plugins.webpack-load-plugins">
+            function <span class="apidocSignatureSpan"></span>webpack-load-plugins
+            <span class="apidocSignatureSpan">(options)</span>
+            </a>
+
+        </li>
+
     </ol></li>
 
 </ol></div>
 
 <div class="apidocSectionDiv">
 <h1><a href="#apidoc.module.webpack-load-plugins" id="apidoc.module.webpack-load-plugins">module webpack-load-plugins</a></h1>
+
+
+    <h2>
+        <a href="#apidoc.element.webpack-load-plugins.webpack-load-plugins" id="apidoc.element.webpack-load-plugins.webpack-load-plugins">
+        function <span class="apidocSignatureSpan"></span>webpack-load-plugins
+        <span class="apidocSignatureSpan">(options)</span>
+        </a>
+    </h2>
+    <ul>
+    <li>description and source-code<pre class="apidocCodePre">webpack-load-plugins = function (options) {
+  var finalObject = {};
+  var configObject;
+  var requireFn;
+  options = options || {};
+
+  var pattern = arrayify(options.pattern || [&#x27;*-webpack-plugin&#x27;,&#x27;@*/*-webpack-plugin&#x27;]);
+  var config = options.config || findup(&#x27;package.json&#x27;, {cwd: parentDir});
+  var scope = arrayify(options.scope || [&#x27;dependencies&#x27;, &#x27;devDependencies&#x27;, &#x27;peerDependencies&#x27;]);
+  var replaceString = options.replaceString || /(-|\.)webpack-plugin$/;
+  var camelizePluginName = options.camelize !== false;
+  var lazy = &#x27;lazy&#x27; in options ? !!options.lazy : true;
+  var renameObj = options.rename || {};
+
+  var renameFn = options.renameFn || function (name) {
+    name = name.replace(replaceString, &#x27;&#x27;);
+    return camelizePluginName ? camelize(name) : name;
+  };
+
+  if(typeof options.requireFn === &#x27;function&#x27;) {
+    requireFn = options.requireFn;
+  } else if(typeof config === &#x27;string&#x27;) {
+    requireFn = function (name) {
+      // This searches up from the specified package.json file, making sure
+      // the config option behaves as expected. See issue #56.
+      var src = resolve.sync(name, { basedir: path.dirname(config) });
+      return require(src);
+    };
+  } else {
+    requireFn = require;
+  }
+
+  configObject = (typeof config === &#x27;string&#x27;) ? require(config) : config;
+
+  if(!configObject) {
+    throw new Error(&#x27;Could not find dependencies. Do you have a package.json file in your project?&#x27;);
+  }
+
+  var names = scope.reduce(function(result, prop) {
+    return result.concat(Object.keys(configObject[prop] || {}));
+  }, []);
+
+  pattern.push(&#x27;!webpack-load-plugins&#x27;);
+
+  function defineProperty(object, requireName, name) {
+    if(lazy) {
+      Object.defineProperty(object, requireName, {
+        get: function() {
+          return requireFn(name);
+        }
+      });
+    } else {
+      object[requireName] = requireFn(name);
+    }
+  }
+
+  function getRequireName(name) {
+    var requireName;
+
+    if(renameObj[name]) {
+      requireName = options.rename[name];
+    } else {
+      requireName = renameFn(name);
+    }
+
+    return requireName;
+  }
+
+  var scopeTest = new RegExp(&#x27;^@&#x27;);
+  var scopeDecomposition = new RegExp(&#x27;^@(.+)/(.+)&#x27;);
+
+  multimatch(names, pattern).forEach(function(name) {
+    if(scopeTest.test(name)) {
+      var decomposition = scopeDecomposition.exec(name);
+
+      if(!finalObject.hasOwnProperty(decomposition[1])) {
+        finalObject[decomposition[1]] = {};
+      }
+
+      defineProperty(finalObject[decomposition[1]], getRequireName(decomposition[2]), name);
+    } else {
+      defineProperty(finalObject, getRequireName(name), name);
+    }
+
+  });
+
+  return finalObject;
+}</pre></li>
+    <li>example usage<pre class="apidocCodePre">n/a</pre></li>
+    </ul>
+
 
 </div>
 
