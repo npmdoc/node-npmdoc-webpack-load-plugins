@@ -1,6 +1,6 @@
 # npmdoc-webpack-load-plugins
 
-#### api documentation for  [webpack-load-plugins (v0.1.2)](https://github.com/samvloeberghs/webpack-load-plugins#readme)  [![npm package](https://img.shields.io/npm/v/npmdoc-webpack-load-plugins.svg?style=flat-square)](https://www.npmjs.org/package/npmdoc-webpack-load-plugins) [![travis-ci.org build-status](https://api.travis-ci.org/npmdoc/node-npmdoc-webpack-load-plugins.svg)](https://travis-ci.org/npmdoc/node-npmdoc-webpack-load-plugins)
+#### basic api documentation for  [webpack-load-plugins (v0.1.2)](https://github.com/samvloeberghs/webpack-load-plugins#readme)  [![npm package](https://img.shields.io/npm/v/npmdoc-webpack-load-plugins.svg?style=flat-square)](https://www.npmjs.org/package/npmdoc-webpack-load-plugins) [![travis-ci.org build-status](https://api.travis-ci.org/npmdoc/node-npmdoc-webpack-load-plugins.svg)](https://travis-ci.org/npmdoc/node-npmdoc-webpack-load-plugins)
 
 #### Automatically load any webpack plugins in your package.json
 
@@ -72,7 +72,8 @@
     "scripts": {
         "test": "NODE_PATH=test/global_modules mocha"
     },
-    "version": "0.1.2"
+    "version": "0.1.2",
+    "bin": {}
 }
 ```
 
